@@ -14,3 +14,17 @@ class Unit:
     def edit_min(self, min):
         self.min = min
 
+    def print_info(self):
+        print("Game Clock: " + self.toc_b + " - " + self.toc_e)
+        print("Time Elapsed: " + self.min)
+        print("Players:")
+        for player in self.players:
+            print(player.name, end="  |  ")
+        print("")
+        print("Old Points For: " + str(self.old_pts_for))
+        print("Old Points Against: " + str(self.old_pts_against))
+        print("Points For: " + str(self.pts_for))
+        print("Points Against: " + str(self.pts_against))
+
+        print("+/- " + str(self.pts_for - self.pts_against))
+        print("*******************************************************\n")

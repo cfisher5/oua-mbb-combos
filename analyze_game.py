@@ -31,7 +31,58 @@ else:
     td_index = 0
 
 for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
+
     q = quarter.caption.h2.span.get("id", "")
+
+    if q != unit.q:
+        unit.toc_e = "0:00"
+        # find the quarter closing score
+        all_tr = quarter.findAll('tr', attrs={'class': 'row'})
+        last_tr = all_tr[0]
+        h_for = int(last_tr.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'h-score'}).text)
+        v_for = int(last_tr.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'v-score'}).text)
+        print(h_for, v_for)
+        # calculate points for + against
+
+        if home_vis == "home":
+            unit.pts_for = h_for - unit.old_pts_for
+            unit.pts_against = v_for - unit.old_pts_against
+
+        else:
+            unit.pts_for = v_for - unit.old_pts_for
+            unit.pts_against = h_for - unit.old_pts_against
+
+        beg_min, beg_sec = unit.toc_b.split(":")
+        total_beg_time = int(beg_min) * 60 + int(beg_sec)
+
+        unit.edit_min(time.strftime('%M:%S', time.gmtime(total_beg_time)))
+        unit.print_info()
+        rotation.add_unit(unit)
+
+        players_q = []
+        p1 = input("Please enter a player who is starting " + q + ": ")
+        p2 = input("Please enter a player who is starting " + q + ": ")
+        p3 = input("Please enter a player who is starting " + q + ": ")
+        p4 = input("Please enter a player who is starting " + q + ": ")
+        p5 = input("Please enter a player who is starting " + q + ": ")
+
+        for p in players:
+            if p.name == p1 or p.name == p2 or p.name == p3 or p.name == p4 or p.name == p5:
+                players_q.append(p)
+
+        q_unit = Unit(players_q)
+        q_unit.toc_b = "10:00"
+        q_unit.q = q
+
+        if home_vis == "home":
+            q_unit.old_pts_for = h_for
+            q_unit.old_pts_against = v_for
+        else:
+            q_unit.old_pts_for = v_for
+            q_unit.old_pts_against = h_for
+
+        unit = q_unit
+
     for entry in quarter.findAll('tr', attrs={'class': home_vis}):
 
         try:
@@ -66,7 +117,7 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
                         keep_checking = False
 
 
-
+                # find corresponding "goes to bench" players
                 if num_players_switching == 1:
                     players_out.append(entry.next_sibling.next_sibling.findAll('td', attrs={'class': 'play'})[td_index].span.text.strip().split("  ")[0].replace("\n", ""))
 
@@ -104,9 +155,10 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
                             'td', attrs={
                                 'class': 'play'})[td_index].span.text.strip().split("  ")[0].replace("\n", ""))
 
-
                 h_for = int(entry.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'h-score'}).text)
                 v_for = int(entry.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'v-score'}).text)
+
+                print(unit.old_pts_for, unit.old_pts_against)
 
                 # calculate points for + against
                 if home_vis == "home":
@@ -116,13 +168,16 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
                     unit.pts_for = v_for - unit.old_pts_for
                     unit.pts_against = h_for - unit.old_pts_against
 
-
                 # calculate min
                 beg_min, beg_sec = unit.toc_b.split(":")
                 total_beg_time = int(beg_min) * 60 + int(beg_sec)
 
                 end_min, end_sec = time_left.split(":")
                 total_end_time = int(end_min) * 60 + int(end_sec)
+
+                print("players in current unit")
+                for player in unit.players:
+                    print(player.name)
 
                 if q != unit.q:
                     # quarter change
@@ -132,17 +187,7 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
 
                 unit.edit_min(time.strftime('%M:%S', time.gmtime(total_time)))
 
-                print("Game Clock: " + unit.toc_b + " - " + time_left)
-                print("Time Elapsed: " + unit.min)
-                print("Players:")
-                for player in unit.players:
-                    print(player.name, end="  |  ")
-                print("")
-                print("Points For: " + str(unit.pts_for))
-                print("Points Against: " +str(unit.pts_against))
-
-                print("+/- " + str(unit.pts_for - unit.pts_against))
-                print("*******************************************************\n")
+                unit.print_info()
 
                 # create new unit
                 players_copy = copy.deepcopy(unit.players)
@@ -186,4 +231,3 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
 
         except AttributeError:
             traceback.print_exc()
-

@@ -14,3 +14,4 @@ class Player:
         else:
             new_name = names[2].upper() + "," + names[0].upper() + " " + names[1].upper()
         return new_name
+
