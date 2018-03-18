@@ -265,6 +265,6 @@ pt.add_row(unit.enter_line())
 rotation.add_unit(unit)
 
 date = url.split("/")[7].split("_")[0]
-fname = date + "_" + team + "_rotation.txt"
+fname = "reports/" + date + "_" + team + "_rotation.txt"
 with open(fname, 'w') as w:
     w.write(str(pt))
