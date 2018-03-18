@@ -1,13 +1,14 @@
 # oua-mbb-combos
 python project for Ontario University Basketball coaching staff to analyze opponents' 5-man rotation patterns
 
-Dependencies:\
-`from urllib.request import urlopen`\
-`from bs4 import BeautifulSoup`\
-`import time`\
-`import copy`\
-`import traceback`
-
+### Dependencies:
+```
+from urllib.request import urlopen\
+from bs4 import BeautifulSoup\
+import time\
+import copy\
+import traceback
+```
 To use the program, `python3 analyze_game.py`\
 You will be asked for two inputs, one after the other\
 It will look as follows\
