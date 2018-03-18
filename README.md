@@ -3,10 +3,10 @@ python project for Ontario University Basketball coaching staff to analyze oppon
 
 ### Dependencies:
 ```
-from urllib.request import urlopen\
-from bs4 import BeautifulSoup\
-import time\
-import copy\
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import time
+import copy
 import traceback
 ```
 To use the program, `python3 analyze_game.py`\
