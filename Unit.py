@@ -28,3 +28,16 @@ class Unit:
 
         print("+/- " + str(self.pts_for - self.pts_against))
         print("*******************************************************\n")
+
+    def enter_line(self):
+        line = []
+        quarter = self.q.replace("prd", "")
+        line.append(quarter)
+        line.append(self.toc_b)
+        for p in self.players:
+            line.append(p.name)
+        line.append(str(self.min))
+        line.append(str(self.pts_for))
+        line.append(str(self.pts_against))
+        line.append(str(self.pts_for - self.pts_against))
+        return line

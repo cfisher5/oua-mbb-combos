@@ -6,9 +6,17 @@ from urllib.request import urlopen
 import time
 import copy
 import traceback
+from prettytable import PrettyTable
+from pdfrw import pdfwriter
+
 
 url, team = get_url()
 players, home_vis = scrape_boxscore(url, team)
+
+pt = PrettyTable(["Q", "Clock", "Player1", "Player2", "Player3", "Player4", "Player5", "Total Time", "Pts For", "Pts Against", "+/-"])
+pt.padding_width = 1
+pt.align = "l"
+pt.align["+/-"] = "r"
 
 print("")
 rotation = Rotation()
@@ -57,6 +65,8 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
 
         unit.edit_min(time.strftime('%M:%S', time.gmtime(total_beg_time)))
         unit.print_info()
+        pt.add_row(unit.enter_line())
+
         rotation.add_unit(unit)
 
         players_q = []
@@ -158,8 +168,6 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
                 h_for = int(entry.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'h-score'}).text)
                 v_for = int(entry.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'v-score'}).text)
 
-                print(unit.old_pts_for, unit.old_pts_against)
-
                 # calculate points for + against
                 if home_vis == "home":
                     unit.pts_for = h_for - unit.old_pts_for
@@ -188,6 +196,7 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
                 unit.edit_min(time.strftime('%M:%S', time.gmtime(total_time)))
 
                 unit.print_info()
+                pt.add_row(unit.enter_line())
 
                 # create new unit
                 players_copy = copy.deepcopy(unit.players)
@@ -231,3 +240,31 @@ for quarter in soup.findAll('table', attrs={'role': 'presentation'}):
 
         except AttributeError:
             traceback.print_exc()
+
+# get final unit
+q4 = soup.findAll('table', attrs={'role': 'presentation'})[3]
+entries = q4.findAll("tr", attrs={"class": "row"})
+last_row = entries[len(entries)-1]
+h_for = int(last_row.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'h-score'}).text)
+v_for = int(last_row.find('td', attrs={'class': 'score'}).find('span', attrs={'class': 'v-score'}).text)
+
+if home_vis == "home":
+    unit.pts_for = h_for - unit.old_pts_for
+    unit.pts_against = v_for - unit.old_pts_against
+else:
+    unit.pts_for = v_for - unit.old_pts_for
+    unit.pts_against = h_for - unit.old_pts_against
+
+# calculate min
+beg_min, beg_sec = unit.toc_b.split(":")
+total_beg_time = int(beg_min) * 60 + int(beg_sec)
+unit.edit_min(time.strftime('%M:%S', time.gmtime(total_beg_time)))
+unit.toc_e = "0:00"
+unit.print_info()
+pt.add_row(unit.enter_line())
+rotation.add_unit(unit)
+
+date = url.split("/")[7].split("_")[0]
+fname = date + "_" + team + "_rotation.txt"
+with open(fname, 'w') as w:
+    w.write(str(pt))
