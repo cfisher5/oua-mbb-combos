@@ -6,7 +6,7 @@ Dependencies:\
 `from bs4 import BeautifulSoup`\
 `import time`\
 `import copy`\
-`import traceback`\
+`import traceback`
 
 To use the program, `python3 analyze_game.py`\
 You will be asked for two inputs, one after the other\
