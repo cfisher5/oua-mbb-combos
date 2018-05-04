@@ -11,7 +11,7 @@ import traceback
 ```
 To use the program, `python3 analyze_game.py`\
 You will be asked for two inputs, one after the other\
-It will look as follows\
+It will look as follows:
 ```
 Enter url of boxscore to scrape: http://www.oua.ca/sports/mbkb/2017-18/boxscores/20180126_d1sm.xml?view=plays
 What team are you scouting? Carleton
